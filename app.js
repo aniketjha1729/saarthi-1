@@ -1,26 +1,4 @@
-// app.js
 
-// ################################################################
-// Overview
-// ################################################################
-/*
-External Captive Portal (ExCAP) for Cisco Meraki MR access points and MX security appliances.
-
-This application provides a basic click-through and sign-on splash page where the login will complete on a success page.
-
-Click-through usage:   https://yourserver/click
-Sign-on usage:         https://yourserver/signon
-
-All HTML content uses Handlebars to provide dynamic data to the various pages.
-The structure of the HTML pages can be modified under /views/filename.hbs
-Images are stored in /public/img
-
-All stateful session data is stored in a local MongoDB, which needs to be configured first.
-This data will consist of the collected parameters and any form data collected from the user.
-
-Written by Cory Guynn - 2015
-www.InternetOfLego.com
-*/
 
 // ################################################################
 // Local Variables
@@ -29,8 +7,6 @@ www.InternetOfLego.com
 // web port
 var port = 8181;
 
-// ExCap parameters and form data object
-//var session = {};
 
 // ################################################################
 // Utilities
@@ -38,8 +14,6 @@ var port = 8181;
 
 // used for debugging purposes to easily print out object data
 var util = require('util');
-  //Example: console.log(util.inspect(session, false, null));
-
 
 // ################################################################
 // Web Services and Middleware
@@ -48,32 +22,10 @@ var util = require('util');
 // express webserver service
 var express = require('express');
 var session = require('express-session');
-// var MongoDBStore = require('connect-mongodb-session')(session);
+
 
 // create the web app
 var app = express();
-
-// session information stored to local mongo database
-// var store = new MongoDBStore({
-//     uri: 'mongodb://localhost:27017/test',
-//     collection: 'excap'
-// });
-
-// Catch errors
-// store.on('error', function(error) {
-//   assert.ifError(error);
-//   assert.ok(false);
-// });
-
-// app.use(require('express-session')({
-//   secret: 'supersecret',  // this secret is used to encrypt cookie and session state. Client will not see this.
-//   cookie: {
-//     maxAge: 1000 * 60 * 60 * 24 // 1 day
-//   },
-//   store: store,
-//   resave: true,
-//   saveUninitialized: true
-// }));
 
 
 
@@ -103,18 +55,7 @@ app.engine('.hbs', exphbs({defaultLayout: 'single', extname: '.hbs'}));
 app.set('view engine', '.hbs');
 
 
-// ################################################################
-// Admin Site mongodb access
-// ################################################################
 
-// var MongoClient = require('mongodb').MongoClient
-//     , format = require('util').format;
-
-// // provide MongoDB REST API for JSON session data
-// // SECURITY WARNING -- ALL SESSION DATA IS AVAILABLE BY ACCESSING THIS ROUTE ! ! ! !
-//   // example to pull JSON data http://yourserver:8181/excapData/excap
-// var expressMongoRest = require('express-mongo-rest');
-// app.use('/excapData', expressMongoRest('mongodb://localhost:27017/test'));
 
 // ################################################################
 // Click-through Splash Page
@@ -152,14 +93,11 @@ app.post('/login', function(req, res){
   req.session.form = req.body.form1;
   req.session.splashlogin_time = new Date().toString();
 
-  // do something with the session and form data (i.e. console, database, file, etc. )
+  
     // write to console
   console.log("Session data at login page = " + util.inspect(req.session, false, null));
 
-  // forward request onto Cisco Meraki to grant access
-    // *** Send user directly to intended page : user_continue_url
-  //res.writeHead(302, {'Location': req.session.base_grant_url + "?continue_url="+req.session.user_continue_url});
-
+  
     // *** Send user to success page : success_url
   res.writeHead(302, {'Location': req.session.base_grant_url + "?continue_url="+req.session.success_url});
 
@@ -236,10 +174,7 @@ app.get('/logout', function (req, res) {
   // do something with the session data (i.e. console, database, file, etc. )
     // display data for debugging purposes
   console.log("Session data at logged-out page = " + util.inspect(req.session, false, null));
-    // write to log file
-  //jsonfile.writeFile(logPath, session, function (err) {
-  //  console.log(err)
-  // })
+    
 
   // render sucess page using handlebars template and send in session data
   res.render('logged-out', req.session);
